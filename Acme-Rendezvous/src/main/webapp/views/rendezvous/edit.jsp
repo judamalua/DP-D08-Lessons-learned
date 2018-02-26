@@ -19,6 +19,7 @@
 <%@taglib prefix="display" uri="http://displaytag.sf.net"%>
 <%@ taglib prefix="acme" tagdir="/WEB-INF/tags"%>
 
+
 <!-- Variables -->
 <spring:message code="rendezvous.moment.placeholder"
 	var="momentPlaceholder" />
@@ -29,6 +30,7 @@
 <p>
 	<em><spring:message code="form.required.params" /></em>
 </p>
+<div class="row">
 <form:form action="${requestURI}" modelAttribute="rendezvous">
 
 	<form:hidden path="id" />
@@ -42,22 +44,26 @@
 			placeholder="${momentPlaceholder}" />
 		<acme:textbox code="rendezvous.pictureUrl" path="pictureUrl" />
 		<acme:textbox code="rendezvous.gpsCoordinates" path="gpsCoordinates"
-			placeholder="${gpsPlaceholder}" required="true" />7
+			placeholder="${gpsPlaceholder}" required="true" />
 	</jstl:if>
 	<acme:select code="rendezvous.similars" path="similars"
 		items="${rendezvouses}" itemLabel="name" multiple="true" />
-		
+
+	
+	<div class = "cleared-div">
 	<jstl:if test="${rendezvous.finalMode== null or !rendezvous.finalMode}">
-		<acme:checkbox code="rendezvous.finalMode" path="finalMode" />
+		<acme:checkbox code="rendezvous.finalMode" path="finalMode" id = "finalMode" />
 		<jstl:if test="${adult}">
-			<acme:checkbox code="rendezvous.adultOnly" path="adultOnly" />
+			<acme:checkbox code="rendezvous.adultOnly" path="adultOnly" id = "adultOnly"/>
 		</jstl:if>
 	</jstl:if>
+	</div>	
 	<acme:submit name="save" code="rendezvous.save" />
-	<jstl:if test="${rendezvous.id!=0}">
+	<jstl:if test="${rendezvous.id!=0 and !rendezvous.finalMode}">
 		<acme:delete clickCode="rendezvous.confirm.delete" name="delete"
 			code="rendezvous.delete" />
 	</jstl:if>
 	<acme:cancel url="rendezvous/user/list.do" code="rendezvous.cancel" />
 
 </form:form>
+</div>

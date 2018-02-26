@@ -12,7 +12,6 @@ package controllers.user;
 
 import java.util.Collection;
 
-import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -134,6 +133,9 @@ public class RendezvousUserController extends AbstractController {
 				rendezvous.setFinalMode(!rendezvous.getFinalMode());
 				user = (User) this.actorService.findActorByPrincipal();
 
+				if (rendezvous.getId() != 0)
+					Assert.isTrue(user.getCreatedRendezvouses().contains(rendezvous));
+
 				this.rendezvousService.save(rendezvous);
 
 				result = new ModelAndView("redirect:list.do");
@@ -141,6 +143,8 @@ public class RendezvousUserController extends AbstractController {
 			} catch (final Throwable oops) {
 				if (oops.getMessage().contains("You must be over 18 to save a Rendezvous with adultOnly"))
 					result = this.createEditModelAndView(rendezvous, "rendezvous.adult.error");
+				else if (oops.getMessage().contains("Must be in future"))
+					result = this.createEditModelAndView(rendezvous, "rendezvous.future.error");
 				else
 					result = this.createEditModelAndView(rendezvous, "rendezvous.commit.error");
 			}
@@ -191,24 +195,24 @@ public class RendezvousUserController extends AbstractController {
 		ModelAndView result;
 		result = this.createEditModelAndView(rendezvous, null);
 
-		//Se le pasa el parametro adult que indicara si el usuario es mayor a 18 años
-		final User user = (User) this.actorService.findActorByPrincipal();
-		result.addObject("adult", user.getBirthDate().before((new DateTime()).minusYears(18).toDate()));
-
 		return result;
 	}
 
 	protected ModelAndView createEditModelAndView(final Rendezvous rendezvous, final String messageCode) {
 		ModelAndView result;
 		Collection<Rendezvous> similars;
+		User user;
 
 		result = new ModelAndView("rendezvous/edit");
 		similars = this.rendezvousService.findFinalRendezvouses();
 		similars.remove(rendezvous);
+		//Se le pasa el parametro adult que indicara si el usuario es mayor a 18 años
+		user = (User) this.actorService.findActorByPrincipal();
 
 		result.addObject("message", messageCode);
 		result.addObject("rendezvouses", similars);
 		result.addObject("rendezvous", rendezvous);
+		result.addObject("adult", this.actorService.checkUserIsAdult(user));
 		result.addObject("requestURI", "rendezvous/user/edit.do");
 
 		return result;

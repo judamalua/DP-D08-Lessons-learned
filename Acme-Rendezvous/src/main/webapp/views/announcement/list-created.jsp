@@ -28,11 +28,18 @@
 	
 	<spring:message code="announcement.rendezvous.name" var="name" />
 	<display:column title="${name}">
-	<a href = "rendezvous/detailed-rendezvous.do?rendezvousId=${rdvs[announcement_rowNum-1].id}&anonymous=false">
+	<a href = "rendezvous/detailed-rendezvous.do?rendezvousId=${rdvs[announcement_rowNum-1].id}">
 	<jstl:out value="${rdvs[announcement_rowNum-1].name}"></jstl:out>
 	</a>	
 	</display:column>
-	
+	<display:column>
+ 		<a
+ 			href="announcement/user/delete.do?announcementId=${announcement.id}">
+ 			<button class="btn">
+ 				<spring:message code="announcement.delete" />
+ 			</button>
+ 		</a>
+ 	</display:column>
 
 	
 

@@ -29,27 +29,19 @@
 <fmt:formatDate var="currentDate" value="${now}"
 	pattern="yyyy-MM-dd HH:mm" />
 
-<jstl:if test="${pageNum!=0}">
-	<!-- Pagination -->
-	<span class="pagebanner"> <jstl:forEach begin="1"
-			end="${pageNum}" var="index">
-			<a href="${requestURI}?&pageage=${index-1}&anonymous=${anonymous}">
-				<jstl:out value="${index}" />
-			</a>
-			<jstl:if test="${index!=pageNum}">,</jstl:if>
-		</jstl:forEach> <br />
-	</span>
-</jstl:if>
 <!-- Pagination -->
+<acme:pagination requestURI = "${requestURI}?anonymous=${anonymous}&page=" pageNum = "${pageNum}" page = "${page}"/>
+
 
 <!-- Display -->
+
 <display:table name="rendezvouses" id="rendezvous"
 	requestURI="${requestURI}">
 
-	<display:column property="name" title="${titleName}" />
+	<display:column property="name" title="${titleName}" sortable = "true"/>
 	<display:column property="description" title="${titleDescription}" />
 	<display:column property="moment" title="${titleMoment}"
-		format="${formatMoment}" />
+		format="${formatMoment}" sortable = "true"/>
 	<display:column>
 		<acme:button
 			url="rendezvous/detailed-rendezvous.do?rendezvousId=${rendezvous.id}&anonymous=${anonymous}"
@@ -75,14 +67,14 @@
 
 	<display:column>
 		<jstl:if test="${rendezvous.deleted}">
-			<img src="images/deleted-rendezvous.png" />
+			<i class="material-icons">delete</i>
 			<spring:message code="rendezvous.deleted" />
 		</jstl:if>
 	</display:column>
 
 	<display:column>
 		<jstl:if test="${rendezvous.adultOnly}">
-			<img src="images/18.png" />
+			<i class="material-icons">do_not_disturb</i>
 			<spring:message code="rendezvous.adultOnly" />
 		</jstl:if>
 	</display:column>
@@ -97,8 +89,9 @@
 
 </display:table>
 
+
 <!-- Creating a new rendezvous -->
 
-<jstl:if test="${not anonymous}">
+<security:authorize access="hasRole('USER')">
 	<acme:button url="rendezvous/user/create.do" code="rendezvous.create" />
-</jstl:if>
+</security:authorize>

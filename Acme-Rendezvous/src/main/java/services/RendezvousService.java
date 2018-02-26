@@ -64,29 +64,12 @@ public class RendezvousService {
 	 */
 	public Rendezvous create() {
 		Rendezvous result;
-		//		User user;
-		//		final Collection<Question> questions;
 		final Collection<Rendezvous> similars;
-		//		final Collection<Announcement> announcements;
-		//		final Collection<Comment> comments;
-		//		final Collection<User> users;
-		//
-		//		questions = new HashSet<Question>();
 		similars = new HashSet<Rendezvous>();
-		//		announcements = new HashSet<Announcement>();
-		//		comments = new HashSet<Comment>();
-		//		users = new HashSet<User>();
-		//
-		//		user = (User) this.actorService.findActorByPrincipal();
-		//		users.add(user);
 
 		result = new Rendezvous();
 
-		//		result.setQuestions(questions);
-		//		result.setAnnouncements(announcements);
-		//		result.setComments(comments);
 		result.setSimilars(similars);
-		//		result.setUsers(users);
 
 		return result;
 
@@ -161,7 +144,7 @@ public class RendezvousService {
 		User user;
 		Actor actor;
 
-		Assert.isTrue(rendezvous.getMoment().after(new Date()));
+		Assert.isTrue(rendezvous.getMoment().after(new Date()), "Must be in future");
 		actor = this.actorService.findActorByPrincipal();
 
 		if (rendezvous.getAdultOnly())
@@ -170,18 +153,7 @@ public class RendezvousService {
 		if (actor instanceof User) {
 			user = (User) this.actorService.findActorByPrincipal();
 
-			if (rendezvous.getId() != 0)
-				Assert.isTrue(user.getCreatedRendezvouses().contains(rendezvous));
-
 			result = this.rendezvousRepository.save(rendezvous);
-
-			//Updating similars
-			for (final Rendezvous similar : rendezvous.getSimilars()) {
-				if (similar.getRendezvouses().contains(rendezvous))
-					similar.getRendezvouses().remove(rendezvous);
-				similar.getRendezvouses().add(result);
-				this.save(similar);
-			}
 
 			if (user.getCreatedRendezvouses().contains(rendezvous))   		//
 				user.getCreatedRendezvouses().remove(rendezvous);			//UPDATING USER
@@ -309,11 +281,8 @@ public class RendezvousService {
 			}
 
 			// Updating users that RSVP rendezvous
-			for (final Rendezvous similar : new ArrayList<Rendezvous>(rendezvous.getSimilars())) {
-				similar.getRendezvouses().remove(rendezvous);
-				this.save(similar);
+			for (final Rendezvous similar : new ArrayList<Rendezvous>(rendezvous.getSimilars()))
 				rendezvous.getSimilars().remove(similar);
-			}
 
 			user.getCreatedRendezvouses().remove(rendezvous); // Deleting rendezvous from user list when an admin deletes a Rendezvous
 			this.actorService.save(user);
@@ -344,7 +313,7 @@ public class RendezvousService {
 			User user;
 			Collection<Question> questions;
 			Collection<Rendezvous> similars;
-			Collection<Rendezvous> rendezvouses;
+			//			Collection<Rendezvous> rendezvouses;
 			Collection<Announcement> announcements;
 			Collection<Comment> comments;
 			Collection<User> users;
@@ -354,7 +323,7 @@ public class RendezvousService {
 			announcements = new HashSet<Announcement>();
 			comments = new HashSet<Comment>();
 			users = new HashSet<User>();
-			rendezvouses = new HashSet<Rendezvous>();
+			//			rendezvouses = new HashSet<Rendezvous>();
 			user = (User) this.actorService.findActorByPrincipal();
 			users.add(user);
 			result = rendezvous;
@@ -368,7 +337,7 @@ public class RendezvousService {
 			result.setComments(comments);
 			result.setSimilars(similars);
 			result.setUsers(users);
-			result.setRendezvouses(rendezvouses);
+			//			result.setRendezvouses(rendezvouses);
 
 		} else {
 			result = this.rendezvousRepository.findOne(rendezvous.getId());
@@ -408,12 +377,6 @@ public class RendezvousService {
 		Rendezvous result;
 
 		result = this.rendezvousRepository.findOne(similar.getId());
-
-		//Updating the similars
-		for (final Rendezvous savedSimilar : result.getSimilars()) {
-			savedSimilar.getRendezvouses().remove(similar);
-			this.save(savedSimilar);
-		}
 
 		if (similar.getSimilars() == null)
 			result.setSimilars(new HashSet<Rendezvous>());

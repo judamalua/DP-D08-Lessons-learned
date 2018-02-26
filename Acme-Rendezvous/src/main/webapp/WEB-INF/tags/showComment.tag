@@ -14,22 +14,23 @@
 <%@ attribute name="comment" required="true" type="domain.Comment"%>
 <%@ attribute name="canUserComment" required="true"%>
 <%@ attribute name="indent" required="true"%>
+<%@ attribute name="anonymous" required="false"%>
 <%-- Definition --%>
 <spring:message code="master.page.moment.format.out" var="formatMoment" />
 <div
 	style="border-left: 1px solid black; border-top: 1px solid black; text-indent: ${indent}px; float:clear;">
 	<div>
 		<h4>${comment.text}</h4>
-
+		<jstl:if test="${not empty comment.pictureUrl}">
+			<img class="materialboxed" data-caption="${comment.text}" width="250" src="${comment.pictureUrl}">
+		</jstl:if>
 		<p>
 			<fmt:formatDate pattern="${formatMoment}" value="${comment.moment}" />
-			<a href="user/display.do?actorId=${comment.user.id}">
+			<a href="user/display.do?actorId=${comment.user.id}&anonymous=${anonymous}">
 				<jstl:out value="${comment.user.userAccount.username}" />
 			</a>
 		</p>
-		<jstl:if test="${not empty comment.pictureUrl}">
-			<img src="${comment.pictureUrl}" width="150" height="150" />
-		</jstl:if>
+
 	</div>
 	<div>
 		<jstl:if test="${canUserComment}">
@@ -55,7 +56,7 @@
 			</summary>
 			<jstl:forEach var="replyComment" items="${comment.comments}">
 				<acme:showComment comment="${replyComment}"
-					canUserComment="${canUserComment}" indent="${indent+30}" />
+					canUserComment="${canUserComment}" indent="${indent+30}" anonymous="${anonymous}"/>
 			</jstl:forEach>
 		</details>
 	</jstl:if>
