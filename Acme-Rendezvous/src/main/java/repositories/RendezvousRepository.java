@@ -26,7 +26,7 @@ public interface RendezvousRepository extends JpaRepository<Rendezvous, Integer>
 	@Query("select r from Rendezvous r join r.similars  rs where rs.id =?1 ")
 	Page<Rendezvous> findRendezvousbySimilar(int id, Pageable pageable);
 
-	@Query("select r from Rendezvous r where r.finalMode=true and r.deleted=false")
+	@Query("select r from Rendezvous r where r.finalMode=true and r.deleted=false and (r.adultOnly=true or r.adultOnly=false)")
 	Page<Rendezvous> findFinalRendezvouses(Pageable pageable);
 
 	@Query("select r from Rendezvous r where r.finalMode=true and r.deleted=false")
@@ -49,6 +49,9 @@ public interface RendezvousRepository extends JpaRepository<Rendezvous, Integer>
 
 	@Query("select r from Rendezvous r join r.users u where r.deleted=false and r.adultOnly=false and u.id=?1")
 	Page<Rendezvous> findRSVPRendezvousesNotAdult(int userId, Pageable pageable);
+
+	@Query("select r from Rendezvous r join r.similars s where s.id=?1")
+	Collection<Rendezvous> findRendezvousContains(int rendezvousId);
 
 	// Dashboard queries.
 
